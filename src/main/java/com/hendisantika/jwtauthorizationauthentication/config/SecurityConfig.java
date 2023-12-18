@@ -1,5 +1,6 @@
 package com.hendisantika.jwtauthorizationauthentication.config;
 
+import com.hendisantika.jwtauthorizationauthentication.security.JwtConfigurer;
 import com.hendisantika.jwtauthorizationauthentication.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -51,6 +52,10 @@ public class SecurityConfig {
                 .and()
                 .apply(configurer());
         return http.build();
+    }
+
+    private JwtConfigurer configurer() {
+        return new JwtConfigurer(jwtTokenProvider);
     }
 
 }
