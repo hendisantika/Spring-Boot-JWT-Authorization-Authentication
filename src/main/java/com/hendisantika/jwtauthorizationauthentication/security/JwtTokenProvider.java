@@ -1,6 +1,9 @@
 package com.hendisantika.jwtauthorizationauthentication.security;
 
 import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -25,4 +28,14 @@ public class JwtTokenProvider {
 
     private final Key key;
     private final JwtParser jwtParser;
+
+    public JwtTokenProvider() {
+        byte[] keyByte;
+        String secret = "jEcHf0ezTD9YxvjPUP7MWdGs4EE6x4GrgHVwh+6wgLUUpOv6exXNYEVgV4mY0Sft4PJxdvv7gRuL5fGyLPrn4w==";
+        keyByte = Decoders.BASE64.decode(secret);
+        key = Keys.hmacShaKeyFor(keyByte);
+        jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
+        this.jwtTokenValidateMillisecondRemember = 1000 * 86_400;
+        this.jwtTokenValidateMilliseconds = 1000 * 3_600;
+    }
 }
