@@ -2,11 +2,17 @@ package com.hendisantika.jwtauthorizationauthentication.security;
 
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,5 +43,23 @@ public class JwtTokenProvider {
         jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
         this.jwtTokenValidateMillisecondRemember = 1000 * 86_400;
         this.jwtTokenValidateMilliseconds = 1000 * 3_600;
+    }
+
+    public String createJwtToken(Authentication authentication, boolean rememberMe) {
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
+        long now = (new Date()).getTime();
+        Date validate;
+        if (rememberMe)
+            validate = new Date(now + jwtTokenValidateMillisecondRemember);
+        else
+            validate = new Date(now + jwtTokenValidateMilliseconds);
+
+        return Jwts.builder()
+                .setSubject(authentication.getName())
+                .claim(AUTHORITIES_KEY, authorities)
+                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(validate)
+                .compact();
     }
 }
