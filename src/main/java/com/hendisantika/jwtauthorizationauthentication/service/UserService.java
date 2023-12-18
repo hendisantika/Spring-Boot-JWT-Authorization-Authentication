@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  * Project : Spring Boot JWT Authorization Authentication
@@ -27,6 +29,10 @@ public class UserService {
         String password = passwordEncoder.encode(user.getPassword());
         user.setPassword(password);
         return userRepository.save(user);
+    }
+
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 
 }
