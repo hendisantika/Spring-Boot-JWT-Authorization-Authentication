@@ -1,5 +1,6 @@
 package com.hendisantika.jwtauthorizationauthentication.service;
 
+import com.hendisantika.jwtauthorizationauthentication.entity.User;
 import com.hendisantika.jwtauthorizationauthentication.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,4 +22,11 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    public User save(User user) {
+        String password = passwordEncoder.encode(user.getPassword());
+        user.setPassword(password);
+        return userRepository.save(user);
+    }
+
 }
