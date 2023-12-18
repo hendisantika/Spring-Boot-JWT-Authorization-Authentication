@@ -1,9 +1,6 @@
 package com.hendisantika.jwtauthorizationauthentication.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
@@ -78,5 +75,28 @@ public class JwtTokenProvider {
                 .collect(Collectors.toList());
         org.springframework.security.core.userdetails.User principal = new User(claims.getSubject(), "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, jwt, authorities);
+    }
+
+    public boolean validateToken(String jwt) {
+        try {
+            jwtParser.parseClaimsJws(jwt);
+            return true;
+        } catch (ExpiredJwtException e) {
+            logger.error("ExpiredJwtException");
+            e.printStackTrace();
+        } catch (UnsupportedJwtException e) {
+            logger.error("UnsupportedJwtException");
+            e.printStackTrace();
+        } catch (MalformedJwtException e) {
+            logger.error("MalformedJwtException");
+            e.printStackTrace();
+        } catch (SignatureException e) {
+            logger.error("SignatureException");
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            logger.error("IllegalArgumentException");
+            e.printStackTrace();
+        }
+        return false;
     }
 }
