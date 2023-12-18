@@ -4,10 +4,7 @@ import com.hendisantika.jwtauthorizationauthentication.entity.User;
 import com.hendisantika.jwtauthorizationauthentication.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,5 +27,10 @@ public class UserController {
     public ResponseEntity create(@RequestBody User user) {
         User savedUser = userService.save(user);
         return ResponseEntity.ok(savedUser);
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity getAll() {
+        return ResponseEntity.ok(userService.findAll());
     }
 }
