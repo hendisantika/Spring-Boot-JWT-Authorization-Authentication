@@ -12,7 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -36,7 +36,7 @@ public class JwtTokenProvider {
     private final long jwtTokenValidateMillisecondRemember;
     private final long jwtTokenValidateMilliseconds;
 
-    private final Key key;
+    private final SecretKey key;
     private final JwtParser jwtParser;
 
     public JwtTokenProvider() {
@@ -44,7 +44,7 @@ public class JwtTokenProvider {
         String secret = "jEcHf0ezTD9YxvjPUP7MWdGs4EE6x4GrgHVwh+6wgLUUpOv6exXNYEVgV4mY0Sft4PJxdvv7gRuL5fGyLPrn4w==";
         keyByte = Decoders.BASE64.decode(secret);
         key = Keys.hmacShaKeyFor(keyByte);
-        jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
+        jwtParser = Jwts.parser().verifyWith(key).build();
         this.jwtTokenValidateMillisecondRemember = 1000 * 86_400;
         this.jwtTokenValidateMilliseconds = 1000 * 3_600;
     }
@@ -60,15 +60,15 @@ public class JwtTokenProvider {
             validate = new Date(now + jwtTokenValidateMilliseconds);
 
         return Jwts.builder()
-                .setSubject(authentication.getName())
+                .subject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities)
-                .signWith(key, SignatureAlgorithm.HS512)
-                .setExpiration(validate)
+                .signWith(key, Jwts.SIG.HS512)
+                .expiration(validate)
                 .compact();
     }
 
     public Authentication getAuthentication(String jwt) {
-        Claims claims = jwtParser.parseClaimsJws(jwt).getBody();
+        Claims claims = jwtParser.parseSignedClaims(jwt).getPayload();
         Collection<? extends GrantedAuthority> authorities = Arrays
                 .stream(claims.get(AUTHORITIES_KEY).toString().split(","))
                 .filter(auth -> !auth.trim().isEmpty())
@@ -80,7 +80,7 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String jwt) {
         try {
-            jwtParser.parseClaimsJws(jwt);
+            jwtParser.parseSignedClaims(jwt);
             return true;
         } catch (ExpiredJwtException e) {
             logger.error("ExpiredJwtException");
