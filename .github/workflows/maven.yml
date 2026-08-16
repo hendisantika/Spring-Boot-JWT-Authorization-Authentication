@@ -19,6 +19,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     services:
       postgres:
         image: postgres:17
