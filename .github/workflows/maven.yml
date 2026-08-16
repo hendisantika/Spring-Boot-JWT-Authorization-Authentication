@@ -19,12 +19,27 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: jwt
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: hendi34
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
     - uses: actions/checkout@v7
-    - name: Set up JDK 21
+    - name: Set up JDK 25
       uses: actions/setup-java@v5.7.0
       with:
-        java-version: '21'
+        java-version: '25'
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
